@@ -92,6 +92,13 @@ dwv.io.Url.prototype.load = function(ioArray)
         }
         else if ( isZip )
         {
+
+            console.log(url);
+            // var zipFs = new zip.fs.FS();
+            // zipFs.importHttpContent(url,false,function(){
+            //     console.log("onend");
+            // });
+
             zipData = this.response;
 
             // http://www.html5rocks.com/ja/tutorials/file/xhr2/
@@ -110,6 +117,33 @@ dwv.io.Url.prototype.load = function(ioArray)
 
                             var blobData = new Blob([zipData],{type: "application/zip"});
                             fileWriter.write(blobData);
+
+                            //////////////////////////////////
+                            // use a BlobReader to read the zip from a Blob object
+                            zip.createReader(new zip.BlobReader(blobData), function(reader) {
+                                // get all entries from the zip
+                                reader.getEntries(function(entries) {
+                                    if (entries.length) {
+                                        // get first entry content as text
+                                        entries[0].getData(new zip.TextWriter(), function(text) {
+                                            // text contains the entry data as a String
+                                            console.log(text);
+
+                                            // close the zip reader
+                                            reader.close(function() {
+                                                // onclose callback
+                                            });
+
+                                        }, function(current, total) {
+                                            // onprogress callback
+                                        });
+                                    }
+                                });
+                            }, function(error) {
+                                // onerror callback
+                            });
+                            //////////////////////////////////
+
                         });
                     });
                 }
@@ -126,13 +160,17 @@ dwv.io.Url.prototype.load = function(ioArray)
     {
         var url = ioArray[i];
         var request = new XMLHttpRequest();
-        // TODO Verify URL...
+        //TODO Verify URL...
         request.open('GET', url, true);
         request.responseType = "arraybuffer";
         request.onload = onLoadRequest;
         request.onerror = onErrorRequest;
         request.onprogress = dwv.gui.updateProgress;
         request.send(null);
+
+
+
+
     }
 };
 
