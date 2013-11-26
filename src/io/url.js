@@ -119,22 +119,45 @@ dwv.io.Url.prototype.load = function(ioArray)
                             fileWriter.write(blobData);
 
                             //////////////////////////////////
+
                             // use a BlobReader to read the zip from a Blob object
                             zip.createReader(new zip.BlobReader(blobData), function(reader) {
                                 // get all entries from the zip
                                 reader.getEntries(function(entries) {
                                     if (entries.length) {
-                                        for(var i=0;i<entries.length;i++){
+                                        //for(var i=0;i<entries.length;i++){
+                                        for (var entry in entries){
                                             // get first entry content as text
-                                            entries[i].getData(new zip.TextWriter(), function(text) {
-                                                // text contains the entry data as a String
-                                                console.log(text);
+                                            //console.log(entries[i].filename);
+                                            entry.getData(new zip.TextWriter(), function(text) {
 
+                                                //////////////////////////////////
+
+                                                window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
+                                                window.requestFileSystem(
+                                                    TEMPORARY,
+                                                    1024*1024*100,
+                                                    function(fs){
+                                                        fs.root.getFile("dicom0"+i+".dcm",{create: true}, function(fileEntry){
+                                                            fileEntry.createWriter(function(fileWriter){
+                                                                fileWriter.onwriteend = function(e) {
+                                                                    console.log("write end!");
+                                                                    console.log(fileEntry.toURL())
+                                                                };
+                                                                fileWriter.onerror = function(e) {console.log("write error!")};
+                                                                var blobData = new Blob([text],{type: "application/dicom"});
+                                                                fileWriter.write(blobData);
+                                                            });
+                                                        });
+                                                    });
+
+                                                //////////////////////////////////
 
                                             }, function(current, total) {
                                                 // onprogress callback
                                             });
-                                        }
+                                        } // for
+                                        //) // forEach
                                     }
                                     // close the zip reader
                                     reader.close(function() {
