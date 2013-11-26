@@ -99,6 +99,7 @@ dwv.io.Url.prototype.load = function(ioArray)
             //     console.log("onend");
             // });
 
+            console.log(this.response);
             zipData = this.response;
 
             // http://www.html5rocks.com/ja/tutorials/file/xhr2/
@@ -137,7 +138,6 @@ dwv.io.Url.prototype.load = function(ioArray)
 
                             var blobData = new Blob([zipData],{type: "application/zip"});
                             fileWriter.write(blobData);
-
                         });
                     });
                 }
@@ -168,12 +168,13 @@ dwv.io.Url.prototype.load = function(ioArray)
 
         fileEntry = files[n];
         filename = fileEntry.filename;
-        console.log(n);
+        //console.log(n);
+        console.log(fileEntry);
+
 
         if ( fileEntry.compressedSize < 500 ) { write_file_to_fs(files, n+1) };
 
         console.log(filename);
-        console.log(fileEntry);
 
         fileEntry.getData(new zip.BlobWriter(), function(blob){
 
@@ -185,7 +186,8 @@ dwv.io.Url.prototype.load = function(ioArray)
                     fs.root.getFile(filename,{create: true}, function(fileEntry){
                         fileEntry.createWriter(function(fileWriter){
                             fileWriter.onwriteend = function(e) {
-                                console.log("write end!");
+                                get_arraybuffer_from_fs(filename);
+                                //console.log("write end!");
                                 console.log(fileEntry.toURL());
                                 write_file_to_fs(files, n+1);
                             }
@@ -199,6 +201,31 @@ dwv.io.Url.prototype.load = function(ioArray)
                 function(error){console.log(error)}
             );
         });
+    }
+
+    function get_arraybuffer_from_fs(filename){
+
+        function onInitFs(fs) {
+
+            fs.root.getFile(filename, {}, function(fileEntry) {
+
+                // Get a File object representing the file,
+                // then use FileReader to read its contents.
+                fileEntry.file(function(file) {
+                    var reader = new FileReader();
+
+                    reader.onloadend = function(e) {
+                        var arrayBuffer = reader.result;
+                        onLoadDicomRequest(arrayBuffer);
+                    };
+
+                    reader.readAsArrayBuffer(file);
+                });
+            });
+        }
+
+        window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
+        window.requestFileSystem(window.TEMPORARY, 1024*1024, onInitFs);
     }
 
 };
