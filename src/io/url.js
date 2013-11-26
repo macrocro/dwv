@@ -32,7 +32,7 @@ dwv.io.Url.prototype.load = function(ioArray)
     var onErrorRequest = function(event)
     {
         onerror( {'name': "RequestError",
-            'message': "An error occurred while retrieving the file: (http) "+this.status } );
+                  'message': "An error occurred while retrieving the file: (http) "+this.status } );
     };
 
     // DICOM request loader
@@ -111,63 +111,32 @@ dwv.io.Url.prototype.load = function(ioArray)
                         fileEntry.createWriter(function(fileWriter){
                             fileWriter.onwriteend = function(e) {
                                 console.log("write end!");
+                                console.log(fileEntry);
                                 console.log(fileEntry.toURL())
+
+                                //////////////////////////////////
+
+                                // use a BlobReader to read the zip from a Blob object
+                                zip.createReader(new zip.BlobReader(blobData), function(reader) {
+                                    // get all entries from the zip
+                                    reader.getEntries(function(entries) {
+                                        if (entries.length) {
+                                            window.entries = entries;
+                                            console.log(entries);
+                                            write_file_to_fs(entries,0);
+                                        }
+                                    });
+                                }, function(error) {
+                                    // onerror callback
+                                });
+                                //////////////////////////////////
+
+
                             };
                             fileWriter.onerror = function(e) {console.log("write error!")};
 
                             var blobData = new Blob([zipData],{type: "application/zip"});
                             fileWriter.write(blobData);
-
-                            //////////////////////////////////
-
-                            // use a BlobReader to read the zip from a Blob object
-                            zip.createReader(new zip.BlobReader(blobData), function(reader) {
-                                // get all entries from the zip
-                                reader.getEntries(function(entries) {
-                                    if (entries.length) {
-                                        //for(var i=0;i<entries.length;i++){
-                                        for (var entry in entries){
-                                            // get first entry content as text
-                                            //console.log(entries[i].filename);
-                                            entry.getData(new zip.TextWriter(), function(text) {
-
-                                                //////////////////////////////////
-
-                                                window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
-                                                window.requestFileSystem(
-                                                    TEMPORARY,
-                                                    1024*1024*100,
-                                                    function(fs){
-                                                        fs.root.getFile("dicom0"+i+".dcm",{create: true}, function(fileEntry){
-                                                            fileEntry.createWriter(function(fileWriter){
-                                                                fileWriter.onwriteend = function(e) {
-                                                                    console.log("write end!");
-                                                                    console.log(fileEntry.toURL())
-                                                                };
-                                                                fileWriter.onerror = function(e) {console.log("write error!")};
-                                                                var blobData = new Blob([text],{type: "application/dicom"});
-                                                                fileWriter.write(blobData);
-                                                            });
-                                                        });
-                                                    });
-
-                                                //////////////////////////////////
-
-                                            }, function(current, total) {
-                                                // onprogress callback
-                                            });
-                                        } // for
-                                        //) // forEach
-                                    }
-                                    // close the zip reader
-                                    reader.close(function() {
-                                        // onclose callback
-                                    });
-                                });
-                            }, function(error) {
-                                // onerror callback
-                            });
-                            //////////////////////////////////
 
                         });
                     });
@@ -192,11 +161,46 @@ dwv.io.Url.prototype.load = function(ioArray)
         request.onerror = onErrorRequest;
         request.onprogress = dwv.gui.updateProgress;
         request.send(null);
-
-
-
-
     }
+
+    function write_file_to_fs(files,n){
+        if ( files.length <= n ) { return true; }
+
+        fileEntry = files[n];
+        filename = fileEntry.filename;
+        console.log(n);
+
+        if ( fileEntry.compressedSize < 500 ) { write_file_to_fs(files, n+1) };
+
+        console.log(filename);
+        console.log(fileEntry);
+
+        fileEntry.getData(new zip.BlobWriter(), function(blob){
+
+            window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
+            window.requestFileSystem(
+                TEMPORARY,
+                1024*1024*100,
+                function(fs){
+                    fs.root.getFile(filename,{create: true}, function(fileEntry){
+                        fileEntry.createWriter(function(fileWriter){
+                            fileWriter.onwriteend = function(e) {
+                                console.log("write end!");
+                                console.log(fileEntry.toURL());
+                                write_file_to_fs(files, n+1);
+                            }
+                            fileWriter.onerror = function(e) {console.log("write error!")};
+
+                            var blobData = new Blob([blob],{type: "application/dicom"});
+                            fileWriter.write(blobData);
+                        });
+                    });
+                },
+                function(error){console.log(error)}
+            );
+        });
+    }
+
 };
 
 //Add the loader to the loader list
