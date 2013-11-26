@@ -124,20 +124,22 @@ dwv.io.Url.prototype.load = function(ioArray)
                                 // get all entries from the zip
                                 reader.getEntries(function(entries) {
                                     if (entries.length) {
-                                        // get first entry content as text
-                                        entries[0].getData(new zip.TextWriter(), function(text) {
-                                            // text contains the entry data as a String
-                                            console.log(text);
+                                        for(var i=0;i<entries.length;i++){
+                                            // get first entry content as text
+                                            entries[i].getData(new zip.TextWriter(), function(text) {
+                                                // text contains the entry data as a String
+                                                console.log(text);
 
-                                            // close the zip reader
-                                            reader.close(function() {
-                                                // onclose callback
+
+                                            }, function(current, total) {
+                                                // onprogress callback
                                             });
-
-                                        }, function(current, total) {
-                                            // onprogress callback
-                                        });
+                                        }
                                     }
+                                    // close the zip reader
+                                    reader.close(function() {
+                                        // onclose callback
+                                    });
                                 });
                             }, function(error) {
                                 // onerror callback
