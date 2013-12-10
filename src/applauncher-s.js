@@ -13,32 +13,31 @@ var app = new dwv.App();
 $(document).ready(function(){
     // initialise buttons
     $("button").button();
-    $("#toggleInfoLayer").button({ icons: 
+    $("#toggleInfoLayer").button({ icons:
         { primary: "ui-icon-comment" }, text: false });
     // create dialogs
-    $("#openData").dialog({ position: 
+    $("#openData").dialog({ position:
         {my: "left top", at: "left top", of: "#pageMain"} });
-    $("#toolbox").dialog({ position: 
+    $("#toolbox").dialog({ position:
         {my: "left top+200", at: "left top", of: "#pageMain"} });
-    $("#history").dialog({ position: 
-        {my: "left top+370", at: "left top", of: "#pageMain"},
-        autoOpen: false });
-    $("#tags").dialog({ position: 
+    $("#history").dialog({ position:
+        {my: "left top+370", at: "left top", of: "#pageMain"}});
+    $("#tags").dialog({ position:
         {my: "right top", at: "right top", of: "#pageMain"},
-        autoOpen: false, width: 500, height: 590 });
-    $("#help").dialog({ position: 
+        width: 500, height: 590 });
+    $("#help").dialog({ position:
         {my: "right top", at: "right top", of: "#pageMain"},
-        autoOpen: false, width: 500, height: 590 });
-    
+        width: 500, height: 590 });
+
     // image dialog
-    $("#layerDialog").dialog({ position: 
+    $("#layerDialog").dialog({ position:
         {my: "left+320 top", at: "left top", of: "#pageMain"}});
     // default size
     $("#layerDialog").dialog({ width: "auto", resizable: false });
     // Resizable but keep aspect ratio
     // TODO it seems to add a border that bothers getting the cursor position...
     //$("#layerContainer").resizable({ aspectRatio: true });
-        
+
     // button listeners
     var button = null;
     // open
@@ -62,15 +61,15 @@ $(document).ready(function(){
     // help
     button = document.getElementById("help-btn");
     if( button ) button.onclick = function() { toggle("#help"); };
-    
+
     // initialise the application
     app.init();
     // align layers when the window is resized
     window.onresize = app.resize;
     // possible load from URL
-    var inputUrls = dwv.html.getUriParam(); 
+    var inputUrls = dwv.html.getUriParam();
     if( inputUrls && inputUrls.length > 0 ) app.loadURL(inputUrls);
-    
+
     // help
     // TODO Seems accordion only works when at end...
     $("#accordion").accordion({ collapsible: "true", active: "false", heightStyle: "content" });

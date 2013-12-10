@@ -1,4 +1,4 @@
-/** 
+/**
  * GUI module.
  * @module gui
  */
@@ -50,6 +50,10 @@ dwv.gui.onChangeLoader = function(event)
         dwv.gui.clearFileLoadHtml();
         dwv.gui.appendUrlLoadHtml();
     }
+    // else if ( this.value == "remote"){
+    //     dwv.gui.clearFileLoadHtml();
+    //     dwv.gui.appendUrlLoadHtml();
+    // }
 };
 
 /**
@@ -144,7 +148,7 @@ dwv.gui.getSliderHtml = function()
         inputMax.setAttribute("min", min);
         inputMax.setAttribute("value", max);
         inputMax.setAttribute("type", "range");
-        
+
         var div = document.createElement("div");
         div.setAttribute("id", "threshold-div");
         div.setAttribute("data-role", "rangeslider");
@@ -219,7 +223,7 @@ dwv.gui.appendLoadboxHtml = function()
     // select
     var loaderSelector = dwv.html.createHtmlSelect("loaderSelect",dwv.io.loaders);
     loaderSelector.onchange = dwv.gui.onChangeLoader;
-    
+
     // node
     var node = document.getElementById("loaderlist");
     // clear it
@@ -228,7 +232,7 @@ dwv.gui.appendLoadboxHtml = function()
     node.appendChild(loaderSelector);
     // trigger create event (mobile)
     $("#loaderlist").trigger("create");
-    
+
     // default load
     dwv.gui.appendFileLoadHtml();
 };
@@ -253,7 +257,7 @@ dwv.gui.appendFileLoadHtml = function()
     var fileLoadDiv = document.createElement("div");
     fileLoadDiv.id = "imagefilesdiv";
     fileLoadDiv.appendChild(fileLoadInput);
-    
+
     // node
     var node = document.getElementById("loaderlist");
     // append
@@ -434,7 +438,7 @@ dwv.gui.appendDrawHtml = function()
     //colourLi.appendChild(colourLabel);
     colourLi.appendChild(colourSelector);
     colourLi.setAttribute("class","ui-block-b");
-    
+
     // node
     var node = document.getElementById("toolList");
     // apend shape
@@ -470,14 +474,14 @@ dwv.gui.appendLivewireHtml = function()
     var colourLabel = document.createElement("label");
     colourLabel.setAttribute("for", "colourSelect");
     colourLabel.appendChild(document.createTextNode("Colour: "));
-    
+
     // list element
     var colourLi = document.createElement("li");
     colourLi.id = "colourLi";
     colourLi.setAttribute("class","ui-block-b");
     //colourLi.appendChild(colourLabel);
     colourLi.appendChild(colourSelector);
-    
+
     // append to tool list
     document.getElementById("toolList").appendChild(colourLi);
     // trigger create event (mobile)
@@ -515,7 +519,7 @@ dwv.gui.appendFilterHtml = function()
     filterLi.setAttribute("class","ui-block-b");
     //filterLi.appendChild(filterLabel);
     filterLi.appendChild(filterSelector);
-    
+
     // append to tool list
     document.getElementById("toolList").appendChild(filterLi);
     // trigger create event (mobile)
@@ -546,7 +550,7 @@ dwv.gui.filter.appendThresholdHtml = function()
     var thresholdLi = document.createElement("li");
     thresholdLi.setAttribute("class","ui-block-c");
     thresholdLi.id = "thresholdLi";
-    
+
     // append to tool list
     document.getElementById("toolList").appendChild(thresholdLi);
     // gui specific slider...
@@ -583,7 +587,7 @@ dwv.gui.filter.appendSharpenHtml = function()
     sharpenLi.id = "sharpenLi";
     sharpenLi.setAttribute("class","ui-block-c");
     sharpenLi.appendChild(buttonRun);
-    
+
     // append to tool list
     document.getElementById("toolList").appendChild(sharpenLi);
     // trigger create event (mobile)
@@ -618,7 +622,7 @@ dwv.gui.filter.appendSobelHtml = function()
     sobelLi.id = "sobelLi";
     sobelLi.setAttribute("class","ui-block-c");
     sobelLi.appendChild(buttonRun);
-    
+
     // append to tool list
     document.getElementById("toolList").appendChild(sobelLi);
     // trigger create event (mobile)
@@ -649,13 +653,13 @@ dwv.gui.appendZoomHtml = function()
     button.onclick = dwv.tool.zoomReset;
     var text = document.createTextNode("Reset");
     button.appendChild(text);
-    
+
     // list element
     var zoomLi = document.createElement("li");
     zoomLi.id = "zoomLi";
     zoomLi.setAttribute("class","ui-block-c");
     zoomLi.appendChild(button);
-    
+
     // append to tool list
     document.getElementById("toolList").appendChild(zoomLi);
     // trigger create event (mobile)
@@ -679,10 +683,10 @@ dwv.gui.clearZoomHtml = function()
  */
 dwv.gui.appendUndoHtml = function()
 {
-    var paragraph = document.createElement("p");  
+    var paragraph = document.createElement("p");
     paragraph.appendChild(document.createTextNode("History:"));
     paragraph.appendChild(document.createElement("br"));
-    
+
     var select = document.createElement("select");
     select.id = "history_list";
     select.name = "history_list";
@@ -735,7 +739,7 @@ dwv.gui.enableInUndoHtml = function(enable)
     var select = document.getElementById("history_list");
     // enable or not (order is important)
     var option;
-    if( enable ) 
+    if( enable )
     {
         // increment selected index
         select.selectedIndex++;
@@ -743,7 +747,7 @@ dwv.gui.enableInUndoHtml = function(enable)
         option = select.options[select.selectedIndex];
         option.disabled = false;
     }
-    else 
+    else
     {
         // disable option
         option = select.options[select.selectedIndex];
@@ -760,11 +764,48 @@ dwv.gui.enableInUndoHtml = function(enable)
  */
 dwv.gui.appendHelpHtml = function(mobile)
 {
+    var toolHelpDiv = document.createElement("div");
+
+    // var input = document.createElement("input");
+    // input.id = "search_field";
+
+    // var submit = document.createElement("button");
+    // submit.id = "submit_btn";
+    // submit_text = document.createTextNode("Submit");
+    // submit.appendChild(submit_text);
+
+    // toolHelpDiv.appendChild(input);
+    // toolHelpDiv.appendChild(submit);
+
+    var listDiv = document.createElement("div");
+    listDiv.id = "list";
+    var select = document.createElement("select");
+    select.id = "remote_list";
+    select.size = "15";
+
+    var submit = document.createElement("button");
+    submit.id = "submit_btn";
+    submit_text = document.createTextNode("Submit");
+    submit.appendChild(submit_text);
+
+    listDiv.appendChild(select);
+    listDiv.appendChild(submit);
+
+    var helpNode = document.getElementById("help");
+    var toolPara = document.createElement("p");
+    toolPara.appendChild(document.createTextNode("These are the tools:"));
+    helpNode.appendChild(toolPara);
+    helpNode.appendChild(toolHelpDiv);
+    helpNode.appendChild(listDiv);
+};
+/*
+dwv.gui.appendHelpHtml = function(mobile)
+{
     var actionType = "mouse";
     if( mobile ) actionType = "touch";
-    
+
     var toolHelpDiv = document.createElement("div");
-    
+
     for ( var t in dwv.tool.tools )
     {
         var tool = dwv.tool.tools[t];
@@ -783,15 +824,15 @@ dwv.gui.appendHelpHtml = function(mobile)
             for( var i=0; i<keys.length; ++i )
             {
                 var action = tool.getHelp()[actionType][keys[i]];
-                
+
                 var img = document.createElement("img");
                 img.src = "resources/"+keys[i]+".png";
                 img.style.float = "left";
                 img.style.margin = "0px 15px 15px 0px";
-                
+
                 var br = document.createElement("br");
                 br.style.clear = "both";
-                
+
                 var para = document.createElement("p");
                 para.appendChild(img);
                 para.appendChild(document.createTextNode(action));
@@ -799,7 +840,7 @@ dwv.gui.appendHelpHtml = function(mobile)
                 docDiv.appendChild(para);
             }
         }
-        
+
         // different div structure for mobile or static
         if( mobile )
         {
@@ -816,15 +857,16 @@ dwv.gui.appendHelpHtml = function(mobile)
             toolHelpDiv.appendChild(docDiv);
         }
     }
-    
+
     var helpNode = document.getElementById("help");
 
     var headPara = document.createElement("p");
     headPara.appendChild(document.createTextNode("This is the main doc."));
     helpNode.appendChild(headPara);
-    
+
     var toolPara = document.createElement("p");
     toolPara.appendChild(document.createTextNode("These are the tools:"));
     helpNode.appendChild(toolPara);
     helpNode.appendChild(toolHelpDiv);
 };
+*/
