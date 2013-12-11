@@ -73,4 +73,11 @@ $(document).ready(function(){
     // help
     // TODO Seems accordion only works when at end...
     $("#accordion").accordion({ collapsible: "true", active: "false", heightStyle: "content" });
+
+    $(document).on('click', '#submit_btn', function(){
+        var val = $('#remote_list option:selected').text();
+        url = Array("http://macrocro.com:8181/search/getZip?series="+val);
+        app.loadURL(url);
+    });
+
 });

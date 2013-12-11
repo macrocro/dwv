@@ -94,11 +94,6 @@ dwv.io.Url.prototype.load = function(ioArray)
         {
 
             console.log(url);
-            // var zipFs = new zip.fs.FS();
-            // zipFs.importHttpContent(url,false,function(){
-            //     console.log("onend");
-            // });
-
             console.log(this.response);
             zipData = this.response;
 
