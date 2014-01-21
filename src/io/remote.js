@@ -13,7 +13,7 @@ $(document).ready(function(){
             var remote_list = $("#remote_list");
 
             for (var i in json ) {
-                remote_list.append("<option>"+json[i].series_description+"</option>");
+                remote_list.append("<option>"+json[i].SeriesDesc+"</option>");
             }
         }
     });

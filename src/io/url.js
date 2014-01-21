@@ -93,8 +93,8 @@ dwv.io.Url.prototype.load = function(ioArray)
         else if ( isZip )
         {
 
-            console.log(url);
-            console.log(this.response);
+            //console.log(url);
+            //console.log(this.response);
             zipData = this.response;
 
             // http://www.html5rocks.com/ja/tutorials/file/xhr2/
@@ -106,9 +106,9 @@ dwv.io.Url.prototype.load = function(ioArray)
                     fs.root.getFile('dicom.zip',{create: true}, function(fileEntry){
                         fileEntry.createWriter(function(fileWriter){
                             fileWriter.onwriteend = function(e) {
-                                console.log("write end!");
-                                console.log(fileEntry);
-                                console.log(fileEntry.toURL())
+                                //console.log("write end!");
+                                //console.log(fileEntry);
+                                //console.log(fileEntry.toURL())
 
                                 //////////////////////////////////
 
@@ -118,7 +118,7 @@ dwv.io.Url.prototype.load = function(ioArray)
                                     reader.getEntries(function(entries) {
                                         if (entries.length) {
                                             window.entries = entries;
-                                            console.log(entries);
+                                            //console.log(entries);
                                             write_file_to_fs(entries,0);
                                         }
                                     });
@@ -150,6 +150,8 @@ dwv.io.Url.prototype.load = function(ioArray)
         var url = ioArray[i];
         var request = new XMLHttpRequest();
         //TODO Verify URL...
+
+        console.time('Download zip');
         request.open('GET', url, true);
         request.responseType = "arraybuffer";
         request.onload = onLoadRequest;
@@ -159,17 +161,20 @@ dwv.io.Url.prototype.load = function(ioArray)
     }
 
     function write_file_to_fs(files,n){
-        if ( files.length <= n ) { return true; }
+        if ( files.length <= n ) {
+            console.timeEnd('timer');
+            return true;
+        }
 
         fileEntry = files[n];
         filename = fileEntry.filename;
         //console.log(n);
-        console.log(fileEntry);
+        //console.log(fileEntry);
 
 
         if ( fileEntry.compressedSize < 500 ) { write_file_to_fs(files, n+1) };
 
-        console.log(filename);
+        //console.log(filename);
 
         fileEntry.getData(new zip.BlobWriter(), function(blob){
 
@@ -183,7 +188,7 @@ dwv.io.Url.prototype.load = function(ioArray)
                             fileWriter.onwriteend = function(e) {
                                 get_arraybuffer_from_fs(filename);
                                 //console.log("write end!");
-                                console.log(fileEntry.toURL());
+                                //console.log(fileEntry.toURL());
                                 write_file_to_fs(files, n+1);
                             }
                             fileWriter.onerror = function(e) {console.log("write error!")};
